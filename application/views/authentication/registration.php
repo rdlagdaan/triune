@@ -1,74 +1,46 @@
 
 <div class="col-lg-9 col-lg-offset-3">
-    <h2>Hello There</h2>
+    <h2>TRIUNE</h2>
     <h5>Please enter the required information below.</h5>     
-<?php 
-  /*  $fattr = array('class' => 'form-signin');
-    echo form_open('/main/register', $fattr); ?>
-    <div class="form-group">
-      <?php echo form_input(array('name'=>'username', 'id'=> 'username', 'placeholder'=>'User Name', 'class'=>'form-control', 'value' => set_value('username'), 'onBlur' => 'checkAvailability()' )); ?>
-      <?php echo form_error('username');?>
-    </div>
-    <div class="form-group">
-      <?php echo form_input(array('name'=>'lastname', 'id'=> 'lastname', 'placeholder'=>'Last Name', 'class'=>'form-control', 'value'=> set_value('lastname'))); ?>
-      <?php echo form_error('lastname');?>
-    </div>
-    <div class="form-group">
-      <?php echo form_input(array('name'=>'email', 'id'=> 'email', 'placeholder'=>'Email', 'class'=>'form-control', 'value'=> set_value('email'))); ?>
-      <?php echo form_error('email');?>
-    </div>
-    <?php echo form_submit(array('value'=>'Sign up', 'class'=>'btn btn-lg btn-primary btn-block')); ?>
-    <?php echo form_close(); ?>
-</div>
-*/
-?>
 
 <form action="" id="the-form">
-    <div class="form-group">
-    <input name="emailAddress" data-validation="email" placeholder='Email Address' class='form-control' data-validation-help="Som help info...">
+
+
+     <div class="input-group col-md-10 input-group-md">
+
+      <div class="input-group-prepend">
+            <div class="input-group-text bg-transparent"><i class="fa fa-user" style="color: blue"></i></div>
+      </div>
+      
+
+      <input name="userName" data-validation="alphanumeric" id="username" placeholder='User Name' class='form-control'  data-validation-error-msg="Please enter a valid username" data-validation-error-msg-container="#message-location" onBlur="checkAvailability()" onFocus="clearMessages()">
+      <span class="input-group-append">
+          <div class="input-group-text bg-transparent">
+            <i class="fa fa-user-plus" id="available" style="display:none; color:green"></i>
+            <i class="fa fa-user-times" id="notAvailable" style="display:none; color:red" ></i>
+          </div>
+            
+      </span>
+      <span class="input-group-append">
+        <i id='status-available' style="display:none; color:green; padding: .5em; font-size:.7em; font-family: Arial, Helvetica, sans-serif; "> Username <br> Available.</i>
+        <i id='status-not-available' style="display:none; color:red; padding: .5em; font-size:.7em; font-family: Arial, Helvetica, sans-serif;"> Username <br> Not Available.</i>
+      </span>
     </div>
-    <p>
-      URL
-      <input name="..." data-validation="url">
-    </p>
-    <p>
-      Only allows alphanumeric characters and hyphen and underscore
-      <input name="..." data-validation="alphanumeric" data-validation-allowing="-_">
-    </p>
-    <p>
-      Only lowercase letters a-z (regexp)
-      <input name="..." data-validation="custom" data-validation-regexp="^([a-z]+)$">
-    </p>
-    <p>
-      Minimum 5 chars
-      <input name="..." data-validation="length" data-validation-length="min5">
-    </p>
-    <p>
-      Maximum 5 chars
-      <input name="..." data-validation="length" data-validation-length="max5">
-    </p>
-    <p>
-      Between 3-5 chars
-      <input name="..." data-validation="length" data-validation-length="3-5">
-    </p>
-    <p>
-      What's your favorite color?
-      <input name="..." data-suggestions="White, Green, Blue, Black, Brown">
-    </p>
-    <p>
-      Validate e-mail but only if an answer is given
-      <input name="..." data-validation="email" data-validation-optional="true">
-    </p>
-    <p>
-      Restrict length
-      <span id="max-length-element">100</span> chars left
-      <textarea id="the-textarea" name="text"></textarea>
-    </p>
-    <p>
-      <input type="submit">
-    </p>
+    <span>
+        <i><img src="<?php echo base_url();?>assets/images/LoaderIcon.gif" class ="progressIconRight" id="loaderIcon" style="display:none" /></i>
+        <b id="message-location" style="color:red; padding: 1em; font-size:.7em; font-family: Arial, Helvetica, sans-serif;"></b>
+    </span>
+
+    
+    <div class="form-group col-lg-6 input-group-sm">
+    <input type="submit">
+    </div>
   </form>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+
+ 
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
 
 
@@ -76,4 +48,43 @@
   $.validate({
     lang: 'es'
   });
+
+
+
+  function checkAvailability() {
+    $("#loaderIcon").show();
+    jQuery.ajax({
+      url: "triuneMain/checkUserName",
+      data:'username='+$("#username").val(),
+      type: "POST",
+      success:function(data){
+      if(data == 0) {
+        $("#status-not-available").hide();
+        $("#status-available").show();
+        $("#loaderIcon").hide();
+        $("#notAvailable").hide();
+        $("#available").show();
+      } else {
+        $("#status-available").hide();
+        $("#status-not-available").show();
+        $("#loaderIcon").hide();
+        $("#available").hide();
+        $("#notAvailable").show();
+      }
+
+    },
+        error:function (){}
+    });
+  }
+
+
+  function clearMessages() {
+    $("#status-not-available").hide();
+    $("#status-available").hide();
+    $("#available").hide();
+    $("#notAvailable").hide();
+
+  }
+
+
 </script>

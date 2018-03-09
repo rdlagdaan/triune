@@ -5,14 +5,19 @@ class MY_Controller extends CI_Controller {
     function __construct()
     {
         parent::__construct();
+        $this->load->model('triuneModelMain');
     }
+
+
+
+
 
 
     //--------------------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------TRIUNE GET RECORDS--------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------
     function _getRecords($tables, $fieldName, $where, $join, $joinType, $sortBy, $sortOrder, $limit, $fieldNameLike, $like, $whereSpecial) {
-        $rows = $this->triune_model->getRecords($tables, $fieldName, $where, $join, $joinType, $sortBy, $sortOrder, $limit, $fieldNameLike, $like, $whereSpecial);
+        $rows = $this->triuneModelMain->getRecords($tables, $fieldName, $where, $join, $joinType, $sortBy, $sortOrder, $limit, $fieldNameLike, $like, $whereSpecial);
         return $rows;
     }
     //--------------------------------------------------------------------------------------------------------------------------------
@@ -25,7 +30,7 @@ class MY_Controller extends CI_Controller {
     //------------------------------------------------TRIUNE GET RECORDS--------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------
     function _getRecordsData($data, $tables, $fieldName, $where, $join, $joinType, $sortBy, $sortOrder, $limit, $fieldNameLike, $like, $whereSpecial, $groupBy) {
-        $rows = $this->triune_model->getRecordsData($data, $tables, $fieldName, $where, $join, $joinType, $sortBy, $sortOrder, $limit, $fieldNameLike, $like, $whereSpecial, $groupBy);
+        $rows = $this->triuneModelMain->getRecordsData($data, $tables, $fieldName, $where, $join, $joinType, $sortBy, $sortOrder, $limit, $fieldNameLike, $like, $whereSpecial, $groupBy);
         return $rows;
     }
     //--------------------------------------------------------------------------------------------------------------------------------
@@ -38,7 +43,7 @@ class MY_Controller extends CI_Controller {
     //------------------------------------------------TRIUNE UPDATE RECORDS-----------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------
     function _updateRecords($tableName, $fieldName, $where, $data) {
-        $rows = $this->triune_model->updateRecords($tableName, $fieldName, $where, $data);
+        $rows = $this->triuneModelMain->updateRecords($tableName, $fieldName, $where, $data);
         return $rows;
     }
     //--------------------------------------------------------------------------------------------------------------------------------
@@ -50,7 +55,7 @@ class MY_Controller extends CI_Controller {
     //------------------------------------------------TRIUNE INSERT RECORDS-----------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------
     function _insertRecords($tableName, $data) {
-        $rows = $this->triune_model->insertRecords($tableName, $data);
+        $rows = $this->triuneModelMain->insertRecords($tableName, $data);
         return $rows;
     }
     //--------------------------------------------------------------------------------------------------------------------------------
@@ -62,7 +67,7 @@ class MY_Controller extends CI_Controller {
     //------------------------------------------------TRIUNE UPDATE RECORDS-----------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------
     function _deleteRecords($tableName, $fieldName, $where) {
-        $rows = $this->triune_model->deleteRecords($tableName, $fieldName, $where);
+        $rows = $this->triuneModelMain->deleteRecords($tableName, $fieldName, $where);
         return $rows;
     }
     //--------------------------------------------------------------------------------------------------------------------------------

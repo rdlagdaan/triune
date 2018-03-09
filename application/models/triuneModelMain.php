@@ -6,7 +6,7 @@ class triuneModelMain extends CI_Model {
     //--------------------------------------------------------------------------------------------------------------------------------------
     //GET RECORDS BY GENERIC ACCESS VERSION1
 	function getRecords($tables, $fieldName, $where, $join, $joinType, $sortBy, $sortOrder, $limit, $fieldNameLike, $like, $whereSpecial) {
-		$q = $this->taims_db->select('*')
+		$q = $this->db->select('*')
 			 ->distinct()
 			 ->from($tables[0]); 
 			 
@@ -73,7 +73,7 @@ class triuneModelMain extends CI_Model {
 			}
 		}
 		
-		$q = $this->taims_db->select($dataSelect)
+		$q = $this->db->select($dataSelect)
 			 ->distinct()
 			 ->from($tables[0]); 
 			 
@@ -137,10 +137,10 @@ class triuneModelMain extends CI_Model {
 		//WHERE--------------------------------------
 		if(!empty($where)) {
 			for($i = 0; $i < count($where);  $i++) {
-		    	$this->taims_db->where($fieldName[$i], $where[$i]);
+		    	$this->db->where($fieldName[$i], $where[$i]);
 			}
 		}
-		$this->taims_db->update($tableName, $data);
+		$this->db->update($tableName, $data);
 
 		return 1;
     }
@@ -153,7 +153,7 @@ class triuneModelMain extends CI_Model {
     //INSERT RECORDS
 	function insertRecords($tableName, $data)
 	{
-		$this->taims_db->insert($tableName, $data);
+		$this->db->insert($tableName, $data);
 		return 1;
 	}
     //INSERT RECORDS
@@ -165,10 +165,10 @@ class triuneModelMain extends CI_Model {
 	{
 		if(!empty($where)) {
 			for($i = 0; $i < count($where);  $i++) {
-		    	$this->taims_db->where($fieldName[$i], $where[$i]);
+		    	$this->db->where($fieldName[$i], $where[$i]);
 			}
 		}
-		$this->taims_db->delete($tableName);
+		$this->db->delete($tableName);
 		
 		return 1;
 	}	

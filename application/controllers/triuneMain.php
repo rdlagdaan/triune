@@ -18,6 +18,12 @@ class triuneMain extends MY_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see https://codeigniter.com/user_guide/general/urls.html
 	 */
+
+    function __construct() {
+        parent::__construct();
+		$this->load->library('session');
+	}//function __construct()
+
 	public function index()
 	{
 		header("Access-Control-Allow-Origin: *");
@@ -38,5 +44,22 @@ class triuneMain extends MY_Controller {
 	public function viewPDF() {
 		$this->load->library('Pdf');
 		$this->load->view('viewPDF');		
+	}
+
+
+	public function checkUserName() {
+		if(!empty($_POST["username"])) {
+			$userName = $_POST["username"];
+			$userRecord = $this->_getRecordsData($data = array('UserID'), $tables = array('triune_user'), $fieldName = array('UserID'), $where = array($userName), 
+				$join = null, $joinType = null, $sortBy = null, $sortOrder = null, $limit = null, 
+				$fieldNameLike = null, $like = null, 
+				$whereSpecial = null, $groupBy = null );
+
+			if(empty($userRecord)) {
+				echo 0;
+			} else {
+				echo 1;
+			}			
+		}
 	}
 }
