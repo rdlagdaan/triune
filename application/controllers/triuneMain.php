@@ -48,8 +48,8 @@ class triuneMain extends MY_Controller {
 
 
 	public function checkUserName() {
-		if(!empty($_POST["username"])) {
-			$userName = $_POST["username"];
+		if(!empty($_POST["userName"])) {
+			$userName = $_POST["userName"];
 			$userRecord = $this->_getRecordsData($data = array('UserID'), $tables = array('triune_user'), $fieldName = array('UserID'), $where = array($userName), 
 				$join = null, $joinType = null, $sortBy = null, $sortOrder = null, $limit = null, 
 				$fieldNameLike = null, $like = null, 
