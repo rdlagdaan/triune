@@ -62,4 +62,8 @@ class triuneMain extends MY_Controller {
 			}			
 		}
 	}
+
+	public function createToken() {
+		echo "Hello";
+	}
 }
