@@ -153,8 +153,9 @@ class triuneModelMain extends CI_Model {
     //INSERT RECORDS
 	function insertRecords($tableName, $data)
 	{
-		$this->db->insert($tableName, $data);
-		return 1;
+		$id = $this->db->insert($tableName, $data);
+		
+		return $this->db->insert_id();
 	}
     //INSERT RECORDS
     //------------------------------------------------------------------------

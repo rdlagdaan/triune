@@ -85,17 +85,18 @@ class triuneMain extends MY_Controller {
 		$birthDate = $this->input->post('birthDate');
 		$studentNumber = $this->input->post('studentNumber');
 
+		$this->session->set_flashdata('emailAddress', $emailAddress);
+		$this->session->set_flashdata('userName', $userName);
+		$this->session->set_flashdata('lastName', $lastName);
+		$this->session->set_flashdata('middleName', $middleName);
+		$this->session->set_flashdata('firstName', $firstName);
+		$this->session->set_flashdata('birthDate', $birthDate);
+		$this->session->set_flashdata('studentNumber', $studentNumber);
+
 
 		if ($this->form_validation->run() == FALSE) {   
 
 			$this->session->set_flashdata('msg', 'All fields are required to be proper. Please try again!');
-			$this->session->set_flashdata('emailAddress', $emailAddress);
-			$this->session->set_flashdata('userName', $userName);
-			$this->session->set_flashdata('lastName', $lastName);
-			$this->session->set_flashdata('middleName', $middleName);
-			$this->session->set_flashdata('firstName', $firstName);
-			$this->session->set_flashdata('birthDate', $birthDate);
-			$this->session->set_flashdata('studentNumber', $studentNumber);
 			redirect(base_url());
 		}else{    
 			
@@ -112,15 +113,15 @@ class triuneMain extends MY_Controller {
 					
 
 			if(!empty($emailAddressExist)){
-				//$this->session->set_flashdata('flash_message', 'User email already exists');
-				//redirect(site_url().'main/login');
-				echo "Email Address Exist";
+				$this->session->set_flashdata('msg', 'Email Address Already Exist!');
+				redirect(base_url());
+	
 			} elseif(!empty($userNameExist)) {
 				
-				echo "UserName Exist";
+				$this->session->set_flashdata('msg', 'Username Already Exist!');
+				redirect(base_url());
 				
 			} else {
-				echo "Continue";
 
 				$userEnrolled = $userRecord = $this->_getRecordsData($data = array('ID'), 
 					$tables = array('triune_personal_data'), 
@@ -132,16 +133,48 @@ class triuneMain extends MY_Controller {
 				
 				if(!empty($userEnrolled)) {
 
-					echo "Proceed with creating token";
+
+                    $clean = $this->security->xss_clean($this->input->post(NULL, TRUE));
+
+					$triune_user = null;
+					$triune_user = array(
+						  'userName' => $clean['userName'],
+						  'emailAddress' => $clean['emailAddress'],
+						  'firstNameUser' => $clean['firstName'],
+						  'lastNameUser' => $clean['lastName'],
+						  'userNumber' => $clean['studentNumber'],
+						  'role' => $this->roles[0],
+						  'status' => $this->status[0],
+					); 
+				    $id = $this->_insertRecords($tableName = 'triune_user', $triune_user);
+					
+					$token = substr(sha1(rand()), 0, 30); 
+					$date = date('Y-m-d');
+
+					$triune_token = null;
+					$triune_token = array(
+						  'token' => $token,
+						  'userID' => $id,
+						  'timeStamp' => $date,
+					); 
+				    $id = $this->_insertRecords($tableName = 'triune_token', $triune_token);
+					$token = $token . $id;
+
+                    $qstring = $this->_base64urlEncode($token);                      
+
+                    $url = site_url() . 'triuneMain/complete/token/' . $qstring;
+                    $link = '<a href="' . $url . '">' . $url . '</a>'; 
+                               
+                    $message = '';                     
+                    $message .= '<strong>You have signed up with our website</strong><br>';
+                    $message .= '<strong>Please click:</strong> ' . $link;                          
+ 
+                    //echo $message; //send this in email
+					
+					$this->_sendMail($toEmail ="rdlagdaan@gmail.com", $subject = "token created", $message);
+
 				} else {
 					$this->session->set_flashdata('msg', "The personal information you've typed do not matched with your current records!");
-					$this->session->set_flashdata('emailAddress', $emailAddress);
-					$this->session->set_flashdata('userName', $userName);
-					$this->session->set_flashdata('lastName', $lastName);
-					$this->session->set_flashdata('middleName', $middleName);
-					$this->session->set_flashdata('firstName', $firstName);
-					$this->session->set_flashdata('birthDate', $birthDate);
-					$this->session->set_flashdata('studentNumber', $studentNumber);
 					redirect(base_url());
 				}
 
@@ -149,4 +182,6 @@ class triuneMain extends MY_Controller {
 		}
 
 	}
+
+
 }
