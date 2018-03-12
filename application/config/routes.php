@@ -50,8 +50,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 $route['default_controller'] = 'triuneMain';
+$route['home'] = 'triuneMain';
 $route['home/about'] = 'triuneMain/about';
 $route['home/pdf'] = 'triuneMain/viewPDF';
+$route['home/create'] = 'triuneMain/createToken';
+
 
 $route['404_override'] = '';
 

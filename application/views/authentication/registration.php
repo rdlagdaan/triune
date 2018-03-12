@@ -4,7 +4,12 @@
     <h6>Please enter the required information below.</h6>     
 
 <!--START ------------------------------ registration FORM  -------------------------------------------START -->
-<form action="triuneMain/createToken" class="toggle-disabled" role="form">
+
+<?php 
+   $attributes = array('method' => 'POST', 'role' => 'form', 'id' => 'createToken' );
+   echo form_open_multipart('home/create', $attributes);
+?>
+
   
     <!--START ------------------------------ userName TextBox  -------------------------------------------START -->
     <div class="input-group col-md-10 input-group-md">
@@ -13,7 +18,7 @@
                   <i class="fa fa-user" style="color: gold"></i>
                 </div>
           </div>
-          <input name="userName" data-validation="alphanumeric" id="userName" placeholder='User Name' class='form-control'  data-validation-error-msg="Please enter a valid username" data-validation-error-msg-container="#messageValidationLocationUserName" onBlur="checkUserAvailability()" onFocus="clearValidationMessages()" >
+          <input name="userName" value="<?php echo $this->session->flashdata('userName'); ?>" data-validation="alphanumeric" id="userName" placeholder='User Name' class='form-control'  data-validation-error-msg="Username is not valid" data-validation-error-msg-container="#messageValidationLocationUserName" onBlur="checkUserAvailability()" onFocus="clearValidationMessages()" >
           <span class="input-group-append">
               <div class="input-group-text bg-transparent">
                 <i class="fa fa-user-plus" id="iconAvailable" style="display:none; color:green"></i>
@@ -39,7 +44,7 @@
                   <i class="fa fa-envelope" style="color: gold"></i>
                 </div>
           </div>
-          <input name="emailAddress" data-validation="email" id="emailAddress" placeholder='Email Address' class='form-control'  data-validation-error-msg="Please enter a valid Email Address" data-validation-error-msg-container="#messageValidationLocationEmailAddress" onBlur="" onFocus="">
+          <input name="emailAddress" value="<?php echo $this->session->flashdata('emailAddress'); ?>" data-validation="email" id="emailAddress" placeholder='Email Address' class='form-control'  data-validation-error-msg="Please enter a valid Email Address" data-validation-error-msg-container="#messageValidationLocationEmailAddress" onBlur="" onFocus="" >
     </div>
     <span>
       <b class="jQueryFormValidationMessage" id="messageValidationLocationEmailAddress"></b>
@@ -50,7 +55,7 @@
 
     <!--START ------------------------------ lastName TextBox  -------------------------------------------START -->
     <div class="input-group col-md-10 input-group-md">
-          <input name="lastName" data-validation="alphanumeric" id="lastName" placeholder='Last Name' class='form-control'  data-validation-error-msg="Please enter Last Name" data-validation-error-msg-container="#messageValidationLocationLastName" onBlur="" onFocus="">
+          <input name="lastName" value="<?php echo $this->session->flashdata('lastName'); ?>" data-validation="alphanumeric" id="lastName" placeholder='Last Name' class='form-control'  data-validation-error-msg="Please enter Last Name" data-validation-error-msg-container="#messageValidationLocationLastName" onBlur="" onFocus="" >
     </div>
     <span>
       <b class="jQueryFormValidationMessage" id="messageValidationLocationLastName"></b>
@@ -59,7 +64,7 @@
 
     <!--START ------------------------------ firstName TextBox  -------------------------------------------START -->
     <div class="input-group col-md-10 input-group-md">
-          <input name="firstName" data-validation="alphanumeric" id="firstName" placeholder='First Name' class='form-control'  data-validation-error-msg="Please enter First Name" data-validation-error-msg-container="#messageValidationLocationFirstName" onBlur="" onFocus="">
+          <input name="firstName" value="<?php echo $this->session->flashdata('firstName'); ?>" data-validation="alphanumeric" id="firstName" placeholder='First Name' class='form-control'  data-validation-error-msg="Please enter First Name" data-validation-error-msg-container="#messageValidationLocationFirstName" onBlur="" onFocus="" >
     </div>
     <span>
       <b class="jQueryFormValidationMessage" id="messageValidationLocationFirstName"></b>
@@ -68,7 +73,7 @@
 
     <!--START ------------------------------ middleName TextBox  -------------------------------------------START -->
     <div class="input-group col-md-10 input-group-md">
-          <input name="middleName" data-validation="alphanumeric" id="middleName" placeholder='Middle Name' class='form-control'  data-validation-error-msg="Please enter Middle Name" data-validation-error-msg-container="#messageValidationLocationMiddleName" onBlur="" onFocus="">
+          <input name="middleName" value="<?php echo $this->session->flashdata('middleName'); ?>" data-validation="alphanumeric" id="middleName" placeholder='Middle Name' class='form-control'  data-validation-error-msg="Please enter Middle Name" data-validation-error-msg-container="#messageValidationLocationMiddleName" onBlur="" onFocus="" >
     </div>
     <span>
       <b class="jQueryFormValidationMessage" id="messageValidationLocationMiddleName"></b>
@@ -78,13 +83,13 @@
 
     <div class="form-group row">
         <div class="col-sm-5">
-          <input name="studentNumber" type="text" class="form-control" id="studentNumber" placeholder="Student Number" data-validation="number" data-validation-allowing="-" data-validation-error-msg="Please enter valid Student Number" data-validation-error-msg-container="#messageValidationLocationStudentNumber">
+          <input name="studentNumber" value="<?php echo $this->session->flashdata('studentNumber'); ?>" type="text" class="form-control" id="studentNumber" placeholder="Student Number" data-validation="number" data-validation-allowing="-" data-validation-error-msg="Please enter valid Student Number" data-validation-error-msg-container="#messageValidationLocationStudentNumber" >
           <span>
             <b class="jQueryFormValidationMessage" id="messageValidationLocationStudentNumber"></b>
           </span>
         </div>
         <div class="col-sm-5">
-          <input type="text" class="form-control" id="birthDate" placeholder="Birth Date (yyyy-mm-dd)" data-validation="date" data-validation-error-msg="Please enter valid date (yyyy-mm-dd)" data-validation-error-msg-container="#messageValidationLocationBirthDate">
+          <input name="birthDate" value="<?php echo $this->session->flashdata('birthDate'); ?>" type="text" class="form-control" id="birthDate" placeholder="Birth Date (yyyy-mm-dd)" data-validation="date" data-validation-error-msg="Please enter valid date (yyyy-mm-dd)" data-validation-error-msg-container="#messageValidationLocationBirthDate" >
           <span>
             <b class="jQueryFormValidationMessage" id="messageValidationLocationBirthDate"></b>
           </span>
@@ -101,13 +106,20 @@
   <!--END ------------------------------ signUp Button  -------------------------------------------END -->
 
 
-</form>
-<!--END ------------------------------ registration FORM  -------------------------------------------END -->
+  <?php echo form_close(); ?>
+  <!--END ------------------------------ registration FORM  -------------------------------------------END -->
+  <?php
+    if ($this->session->flashdata('msg')){ //change!
+        echo "<div class='message' style='color:red'>";
+        echo $this->session->flashdata('msg');
+        echo "</div>";
+    }
+  ?>
 
 
+<script type="text/javascript" src="<?php echo base_url();?>assets/scripts/jquery-3.3.1.min.js"></script>
 
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
 
 
@@ -127,11 +139,35 @@
       success:function(data){
       if(data == 0) {
         $("#messageNotAvailable").hide();
-        $("#messageAvailable").show();
+        console.log($("#userName").val().length);
+       // if( $("#userName").val().length > 0 ) {
+          $("#messageAvailable").show();
+          $("#iconAvailable").show();
+
+       // }
+
         $("#iconLoader").hide();
         $("#iconNotAvailable").hide();
-        $("#iconAvailable").show();
         $("#formButton").removeAttr('disabled');
+
+      //  var userName = $("#userName").attr('class');
+      //var emailAddress = $("#emailAddress").attr('class');
+      //var lastName = $("#lastName").attr('class');
+     // var firstName = $("#firstName").attr('class');
+      //var middleName = $("#middleName").attr('class');
+      //var studentNumber = $("#studentNumber").attr('class');
+     // var birthDate = $("#birthDate").attr('class');
+      //var messageNotAvailable = $("#messageNotAvailable").attr('style');
+
+
+     // if ((messageNotAvailable == "display: none;" && userName == "form-control valid" && emailAddress == "form-control valid" && lastName == "form-control valid" && firstName == "form-control valid" && middleName == "form-control valid" && studentNumber == "form-control valid" && birthDate == "form-control valid")) {
+
+
+     //     $("#formButton").removeAttr('disabled');
+     // }
+
+
+
 
       } else {
         $("#messageAvailable").hide();
@@ -162,50 +198,21 @@
   }
 
 
-  $(document).ready(function() {
-    $("#formButton").attr('disabled', 'disabled');
-   /* $("form").keyup(function() {
-      // To Disable Submit Button
-      $("#formButton").attr('disabled', 'disabled');
-      // Validating Fields
-      var userName = $("#userName").attr('class');
-      var emailAddress = $("#emailAddress").attr('class');
-      var lastName = $("#lastName").attr('class');
-      var firstName = $("#firstName").attr('class');
-      var middleName = $("#middleName").attr('class');
-      var studentNumber = $("#studentNumber").attr('class');
-      var birthDate = $("#birthDate").attr('class');
-      var messageNotAvailable = $("#messageNotAvailable").attr('style');
-
-      if ((messageNotAvailable == "display: none;" && userName == "form-control valid" && emailAddress == "form-control valid" && lastName == "form-control valid" && firstName == "form-control valid" && middleName == "form-control valid" &&studentNumber == "form-control valid" && birthDate == "form-control valid")) {
-          // To Enable Submit Button
-          $("#formButton").removeAttr('disabled');
-          $("#formButton").css({
-            "cursor": "pointer",
-          "box-shadow": "1px 0px 6px #333"
-          });
-      }
-    });
+  //$(document).ready(function() {
+  //  $("#formButton").attr('disabled', 'disabled');
+  //});
 
 
-    // On Click Of Submit Button
-    $("#formButton").click(function() {
-    $("#formButton").css({
-      "cursor": "default",
-      "box-shadow": "none"
-    });
-    alert("Form Submitted Successfully..!!");
-  });*/
-});
-
-
-$('body').on('blur click keyup propertychange change paste input', function(e) {
+/*
+$(document).on('keyup keypress blur change mouseleave', function(e) {
     //var  eventType = e.type;
     // do stuff
     //$("#formButton").attr('disabled', 'disabled');
-    $("form").keyup(function() {
+    //console.log("hello");
+    $("#formButton").attr('disabled', 'disabled');
+
+    //$("form").keyup(function() {
       // To Disable Submit Button
-      $("#formButton").attr('disabled', 'disabled');
       // Validating Fields
       var userName = $("#userName").attr('class');
       var emailAddress = $("#emailAddress").attr('class');
@@ -216,15 +223,18 @@ $('body').on('blur click keyup propertychange change paste input', function(e) {
       var birthDate = $("#birthDate").attr('class');
       var messageNotAvailable = $("#messageNotAvailable").attr('style');
 
-      if ((messageNotAvailable == "display: none;" && userName == "form-control valid" && emailAddress == "form-control valid" && lastName == "form-control valid" && firstName == "form-control valid" && middleName == "form-control valid" &&studentNumber == "form-control valid" && birthDate == "form-control valid")) {
+
+     // consoleconsole.log("test here 1");
+      if ((messageNotAvailable == "display: none;" && userName == "form-control valid" && emailAddress == "form-control valid" && lastName == "form-control valid" && firstName == "form-control valid" && middleName == "form-control valid" && studentNumber == "form-control valid" && birthDate == "form-control valid")) {
           // To Enable Submit Button
+          //console.log("test here");
           $("#formButton").removeAttr('disabled');
           $("#formButton").css({
             "cursor": "pointer",
           "box-shadow": "1px 0px 6px #333"
           });
       }
-    });
+    //});
 
 
     // On Click Of Submit Button
@@ -235,6 +245,7 @@ $('body').on('blur click keyup propertychange change paste input', function(e) {
     });
     alert("Form Submitted Successfully..!!");
   });
-});
+});*/
+
 
 </script>
