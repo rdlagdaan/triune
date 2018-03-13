@@ -77,9 +77,50 @@ class MY_Controller extends CI_Controller {
 	public function _base64urlEncode($data) { 
 		return rtrim(strtr(base64_encode($data), '+/', '-_'), '='); 
 	} 
-	public function _base64urlDecode($data) { 
+
+
+    public function _base64urlDecode($data) { 
 		return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT)); 
 	}       
+
+
+
+
+    public function _isTokenValid($token) {
+       $tkn = substr($token,0,30);
+       $uid = substr($token,30);      
+       
+       
+       $result = $userRecord = $this->_getRecordsData($data = array('*'), 
+            $tables = array('triune_token'), 
+            $fieldName = array('token', 'userID'), 
+            $where = array($tkn, $uid), 
+            $join = null, $joinType = null, $sortBy = null, $sortOrder = null, $limit = null, 
+            $fieldNameLike = null, $like = null, 
+            $whereSpecial = null, $groupBy = null );
+
+
+        if($result) {
+            $created = $result[0]->timeStamp;
+            $createdTS = strtotime($created);
+            $today = date('Y-m-d'); 
+            $todayTS = strtotime($today);
+
+            if($createdTS != $todayTS){
+                return false;
+            }
+
+            $userInfo = $this->_getRecordsData($data = array('*'), $tables = array('triune_user'), $fieldName = array('ID'), $where = array($result[0]->userID), 
+                $join = null, $joinType = null, $sortBy = null, $sortOrder = null, $limit = null, 
+                $fieldNameLike = null, $like = null, 
+                $whereSpecial = null, $groupBy = null );
+            return $userInfo;
+        } else {
+            return false;
+        }
+
+        
+    } 
 
 
     public function _sendMail($toEmail, $subject, $message) { 
@@ -118,6 +159,23 @@ class MY_Controller extends CI_Controller {
         }
      } 
 
+
+     public function _insertToken($id) {
+        $token = substr(sha1(rand()), 0, 30); 
+        $date = date('Y-m-d');
+
+        
+        $triune_token = null;
+        $triune_token = array(
+              'token' => $token,
+              'userID' => $id,
+              'timeStamp' => $date,
+        ); 
+        $this->_insertRecords($tableName = 'triune_token', $triune_token);
+        $token = $token . $id;
+        $qstring = $this->_base64urlEncode($token);                      
+        return $qstring;
+     }
 
 }
 

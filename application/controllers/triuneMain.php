@@ -26,6 +26,7 @@ class triuneMain extends MY_Controller {
 		$this->form_validation->set_error_delimiters('<div class="error">', '</div>');
 		$this->status = $this->config->item('status'); 
 		$this->roles = $this->config->item('roles');
+		$this->load->library('encryption');		
 	}//function __construct()
 
 	public function index()
@@ -111,19 +112,19 @@ class triuneMain extends MY_Controller {
 				$fieldNameLike = null, $like = null, 
 				$whereSpecial = null, $groupBy = null );
 					
-
-			if(!empty($emailAddressExist)){
-				$this->session->set_flashdata('msg', 'Email Address Already Exist!');
-				redirect(base_url());
-	
-			} elseif(!empty($userNameExist)) {
 				
+			if(!empty($userNameExist)){
 				$this->session->set_flashdata('msg', 'Username Already Exist!');
-				redirect(base_url());
+				redirect(base_url().'home/login');
+	
+			} elseif(!empty($emailAddressExist)) {
+				
+				$this->session->set_flashdata('msg', 'Email Address Already Exist!');
+				redirect(base_url().'home/login');
 				
 			} else {
 
-				$userEnrolled = $userRecord = $this->_getRecordsData($data = array('ID'), 
+				$userEnrolled = $this->_getRecordsData($data = array('ID'), 
 					$tables = array('triune_personal_data'), 
 					$fieldName = array('lastName', 'firstName', 'middleName', 'studentNumber', 'birthDate'), 
 					$where = array($lastName, $firstName, $middleName, $studentNumber, $birthDate), 
@@ -148,19 +149,8 @@ class triuneMain extends MY_Controller {
 					); 
 				    $id = $this->_insertRecords($tableName = 'triune_user', $triune_user);
 					
-					$token = substr(sha1(rand()), 0, 30); 
-					$date = date('Y-m-d');
 
-					$triune_token = null;
-					$triune_token = array(
-						  'token' => $token,
-						  'userID' => $id,
-						  'timeStamp' => $date,
-					); 
-				    $id = $this->_insertRecords($tableName = 'triune_token', $triune_token);
-					$token = $token . $id;
-
-                    $qstring = $this->_base64urlEncode($token);                      
+					$qstring = $this->_insertToken($id);
 
                     $url = site_url() . 'triuneMain/complete/token/' . $qstring;
                     $link = '<a href="' . $url . '">' . $url . '</a>'; 
@@ -181,6 +171,264 @@ class triuneMain extends MY_Controller {
 			}           
 		}
 
+	}
+
+	public function complete() {
+		$token = $this->_base64urlDecode($this->uri->segment(4));       
+		$cleanToken = $this->security->xss_clean($token);
+		
+		$userInfo = $this->_isTokenValid($cleanToken); //either false or array();    
+
+		if(empty($userInfo)) {
+			$this->session->set_flashdata('msg', 'Token is invalid or expired');
+			redirect(base_url());			
+		}
+
+		$data = array(
+			'firstName'=> $userInfo[0]->firstNameUser, 
+			'emailAddress'=>$userInfo[0]->emailAddress, 
+			'userID'=>$userInfo[0]->ID, 
+			'userName'=>$userInfo[0]->userName, 
+			'token'=>$this->_base64urlEncode($token)
+		);
+
+
+		$this->form_validation->set_rules('password', 'Password', 'required|min_length[5]');
+		$this->form_validation->set_rules('passwordConfirmation', 'Password Confirmation', 'required|matches[password]');         
+
+		if ($this->form_validation->run() == FALSE) {   
+			//$this->load->view('authentication/header');
+			//$this->load->view('authentication/complete', $data);
+			//$this->load->view('authentication/footer');
+
+			header("Access-Control-Allow-Origin: *");
+			$this->template->set('title', 'Home');
+			$this->template->load('default_layout', 'contents' , 'authentication/complete', $data);
+
+
+
+		} else {
+			$post = $this->input->post(NULL, TRUE);
+			$key = bin2hex($this->encryption->create_key(16));
+			$cleanPost = $this->security->xss_clean($post);
+
+			$hashed = $this->encryption->encrypt($cleanPost['password']);                
+			$cleanPost['password'] = $hashed;
+			unset($cleanPost['passwordConfirmation']);
+
+			$triuneUserUpdate = array(
+				'password' => $cleanPost['password'],
+				'lastLogin' => date('Y-m-d h:i:s A'),
+				'status' => $this->status[1],
+			);
+			$recordUpdated = $this->_updateRecords($tableName = 'triune_user', $fieldName = array('ID'), $where = array($userInfo[0]->ID), $triuneUserUpdate);
+
+			if(!$recordUpdated){
+				error_log('Unable to updateUserInfo('.$userInfo[0]->ID.')');
+				return false;
+			}
+
+			$updatedUser = $this->_getRecordsData($data = array('*'), 
+				$tables = array('triune_user'), 
+				$fieldName = array('ID'), 
+				$where = array($userInfo[0]->ID), 
+				$join = null, $joinType = null, $sortBy = null, $sortOrder = null, $limit = null, 
+				$fieldNameLike = null, $like = null, 
+				$whereSpecial = null, $groupBy = null );
+
+			
+			if(!$updatedUser){
+				$this->session->set_flashdata('msg', 'There was a problem updating your record');
+				redirect(site_url().'home/login');
+			}
+
+
+			unset($updatedUser[0]->password);
+
+			foreach($updatedUser[0] as $key=>$val){
+				$this->session->set_userdata($key, $val);
+			}
+			redirect(base_url().'home/login');
+
+
+		}
+
+	}
+
+
+	public function login()
+	{
+		$this->form_validation->set_rules('userName', 'User Name', 'required');    
+		$this->form_validation->set_rules('password', 'Password', 'required'); 
+		
+		if($this->form_validation->run() == FALSE) {
+			header("Access-Control-Allow-Origin: *");
+			$data = array();
+			$this->template->set('title', 'Home');
+			$this->template->load('default_layout', 'contents' , 'authentication/login', $data);
+		}else{
+			
+			$post = $this->input->post();  
+			$clean = $this->security->xss_clean($post);
+		
+
+			
+			$getPassword = $this->_getRecordsData($data = array('*'), $tables = array('triune_user'), $fieldName = array('userName'), $where = array($clean['userName']), 
+				$join = null, $joinType = null, $sortBy = null, $sortOrder = null, $limit = null, $fieldNameLike = null, $like = null, $whereSpecial = null, $groupBy = null );
+		
+			if(!empty($getPassword)) {
+				$decryptedPassword = $this->encryption->decrypt($getPassword[0]->password);
+				echo $decryptedPassword;
+			
+				if($decryptedPassword !== $clean['password']) {
+					$this->session->set_flashdata('msg', 'The login was unsucessful');
+					redirect(site_url().'home/login');
+				}
+			
+			} 
+						
+			
+			foreach($getPassword[0] as $key=>$val){
+				$this->session->set_userdata($key, $val);
+			}
+			//redirect(site_url().'main/');
+
+			$triuneUserUpdate = array(
+				'lastLogin' => date('Y-m-d h:i:s A'),
+			);
+			$recordUpdated = $this->_updateRecords($tableName = 'triune_user', $fieldName = array('ID'), $where = array($getPassword[0]->ID), $triuneUserUpdate);
+
+
+			echo "login successfull";
+		}
+		
+	}
+
+
+
+	public function forgotPassword()
+	{
+		
+		$this->form_validation->set_rules('emailAddress', 'Email Address', 'required|valid_email'); 
+		
+		if($this->form_validation->run() == FALSE) {
+			header("Access-Control-Allow-Origin: *");
+			$this->template->set('title', 'Home');
+			$this->template->load('default_layout', 'contents' , 'authentication/forgot');
+
+		}else{
+			$emailAddress = $this->input->post('emailAddress');  
+			$clean = $this->security->xss_clean($emailAddress);
+		
+			$getUserInfo = $this->_getRecordsData($data = array('*'), $tables = array('triune_user'), $fieldName = array('emailAddress'), $where = array($clean), 
+				$join = null, $joinType = null, $sortBy = null, $sortOrder = null, $limit = null, $fieldNameLike = null, $like = null, $whereSpecial = null, $groupBy = null );
+	
+		
+			if(empty($getUserInfo)){
+				$this->session->set_flashdata('msg', 'We cant find your email address');
+				redirect(site_url().'home/login');
+			}   
+
+			
+			if($getUserInfo[0]->status != $this->status[1]){ //if status is not approved
+				$this->session->set_flashdata('flash_message', 'Your account is not in approved status');
+				redirect(site_url().'home/login');
+			}
+			
+			//build token 
+			
+			$qstring = $this->_insertToken($getUserInfo[0]->ID);
+
+			$url = site_url() . 'triuneMain/resetPassword/token/' . $qstring;
+			$link = '<a href="' . $url . '">' . $url . '</a>'; 
+			
+			$message = '';                     
+			$message .= '<strong>A password reset has been requested for this email account</strong><br>';
+			$message .= '<strong>Please click:</strong> ' . $link;             
+	
+			$this->_sendMail($toEmail ="rdlagdaan@gmail.com", $subject = "token created", $message);
+			
+			//echo $message; //send this through mail
+			//exit;
+			
+		}
+		
+	}
+
+
+
+	public function resetPassword()
+	{
+		$token = $this->_base64urlDecode($this->uri->segment(4));         
+		$cleanToken = $this->security->xss_clean($token);
+		
+		
+		$userInfo = $this->_isTokenValid($cleanToken); //either false or array();    
+		
+		if(empty($userInfo)) {
+			$this->session->set_flashdata('msg', 'Token is invalid or expired');
+			redirect(base_url());			
+		}
+		
+		$data = array(
+			'firstName'=> $userInfo[0]->firstNameUser, 
+			'emailAddress'=>$userInfo[0]->emailAddress, 
+			'ID'=>$userInfo[0]->ID, 
+			'userName'=>$userInfo[0]->userName, 
+			'token'=>$this->_base64urlEncode($token)
+		);
+		
+		
+
+		$this->form_validation->set_rules('password', 'Password', 'required|min_length[5]');
+		$this->form_validation->set_rules('passwordConfirmation', 'Password Confirmation', 'required|matches[password]');              
+		
+		if ($this->form_validation->run() == FALSE) {   
+			header("Access-Control-Allow-Origin: *");
+			$this->template->set('title', 'Home');
+			$this->template->load('default_layout', 'contents' , 'authentication/reset', $data);
+
+		}else{
+
+			$post = $this->input->post(NULL, TRUE);
+			$cleanPost = $this->security->xss_clean($post);
+			$hashed = $this->encryption->encrypt($cleanPost['password']);                
+			$cleanPost['password'] = $hashed;
+			$cleanPost['ID'] = $userInfo[0]->ID;
+			
+			unset($cleanPost['passwordConfirmation']);
+
+			$triuneUserUpdate = array(
+				'password' => $cleanPost['password'],
+				'lastLogin' => date('Y-m-d h:i:s A'),
+				'status' => $this->status[1],
+			);
+			$recordUpdated = $this->_updateRecords($tableName = 'triune_user', $fieldName = array('ID'), $where = array($userInfo[0]->ID), $triuneUserUpdate);
+
+			if(!$recordUpdated){
+				error_log('Unable to updateUserInfo('.$userInfo[0]->ID.')');
+				return false;
+			}
+
+			$updatedUser = $this->_getRecordsData($data = array('*'), 
+				$tables = array('triune_user'), 
+				$fieldName = array('ID'), 
+				$where = array($userInfo[0]->ID), 
+				$join = null, $joinType = null, $sortBy = null, $sortOrder = null, $limit = null, 
+				$fieldNameLike = null, $like = null, 
+				$whereSpecial = null, $groupBy = null );
+
+			
+			if(!$updatedUser){
+				$this->session->set_flashdata('flash_message', 'There was a problem updating your password');
+				redirect(site_url().'home/login');
+			}
+
+			$this->session->set_flashdata('flash_message', 'There was a problem updating your password');
+			
+
+
+		}
 	}
 
 

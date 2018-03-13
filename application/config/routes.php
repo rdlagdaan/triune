@@ -54,6 +54,9 @@ $route['home'] = 'triuneMain';
 $route['home/about'] = 'triuneMain/about';
 $route['home/pdf'] = 'triuneMain/viewPDF';
 $route['home/create'] = 'triuneMain/createToken';
+$route['home/login'] = 'triuneMain/login';
+$route['home/forgot'] = 'triuneMain/forgotPassword';
+$route['home/reset'] = 'triuneMain/resetPassword';
 
 
 $route['404_override'] = '';
