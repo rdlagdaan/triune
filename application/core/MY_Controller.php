@@ -128,9 +128,9 @@ class MY_Controller extends CI_Controller {
         $config = Array(
             'protocol' => 'smtp',
             'smtp_host' => 'smtp.googlemail.com',
-            'smtp_port' => 465,
+            'smtp_port' => 587,
             'smtp_user' => 'trinityemailer@gmail.com',
-            'smtp_pass' => 'trinity@1963',
+            'smtp_pass' => 'tr1n1ty@1963',
             'mailtype' => 'html',
             'charset' => 'iso-8859-1',
             'starttls'  => TRUE,
@@ -156,7 +156,31 @@ class MY_Controller extends CI_Controller {
         } else {
             $this->session->set_flashdata("email_sent","Error in sending Email."); 
             echo "NOT OK";
+            var_dump($this->email->send());
         }
+
+
+   /*     $this->load->library('email');
+        $this->email->from('trinityemailer@gmail.com'); //change it
+        $this->email->to($toEmail); //change it
+        $this->email->subject($subject);
+        $this->email->message($message);
+        if ($this->email->send())
+        {
+           $data['success'] = 'Yes';
+            var_dump($data);
+        }
+        else
+        {
+           $data['success'] = 'No';
+           $data['error'] = $this->email->print_debugger(array(
+              'headers'
+           ));
+           var_dump($data);           
+        }
+     */
+
+
      } 
 
 

@@ -1,4 +1,4 @@
-<div class="col-lg-4 col-lg-offset-4">
+<div class="col-lg-6 col-lg-offset-6">
     <h2>Please login</h2>
     <?php $fattr = array('class' => 'form-signin');
          echo form_open(site_url().'home/login/', $fattr); ?>

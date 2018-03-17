@@ -49,14 +49,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'triuneMain';
-$route['home'] = 'triuneMain';
-$route['home/about'] = 'triuneMain/about';
-$route['home/pdf'] = 'triuneMain/viewPDF';
-$route['home/create'] = 'triuneMain/createToken';
-$route['home/login'] = 'triuneMain/login';
-$route['home/forgot'] = 'triuneMain/forgotPassword';
-$route['home/reset'] = 'triuneMain/resetPassword';
+$route['default_controller'] = 'triuneAuth/login';
+$route['main'] = 'triuneMain';
+
+$route['auth/login'] = 'triuneAuth/login';
+$route['auth/register'] = 'triuneAuth/registration';
+$route['auth/create'] = 'triuneAuth/createToken';
+$route['auth/forgot'] = 'triuneAuth/forgotPassword';
+$route['auth/reset'] = 'triuneAuth/resetPassword';
+
+$route['test/about'] = 'triuneMain/about';
+$route['test/pdf'] = 'triuneMain/viewPDF';
 
 
 $route['404_override'] = '';
